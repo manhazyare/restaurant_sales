@@ -1,0 +1,77 @@
+-- Q1. Most Preferred Payment Method
+SELECT
+    payment_method,
+    COUNT(*) AS total_payments
+FROM restaurant_data
+GROUP BY payment_method
+ORDER BY total_payments DESC;
+-- Q2. Most Selling Product (By Quantity & Revenue)
+SELECT
+    product_name,
+    SUM(quantity) AS total_quantity_sold,
+    SUM(price * quantity) AS total_revenue
+FROM restaurant_data
+GROUP BY product_name
+ORDER BY total_revenue DESC;
+-- Q3. Which City or Manager Generated Maximum Revenue?
+SELECT
+    city,
+    SUM(price * quantity) AS total_revenue
+FROM restaurant_data
+GROUP BY city
+ORDER BY total_revenue DESC;
+SELECT
+    manager,
+    SUM(price * quantity) AS total_revenue
+FROM restaurant_data
+GROUP BY manager
+ORDER BY total_revenue DESC;
+-- Q4. Date-wise Revenue
+SELECT
+    order_date,
+    SUM(price * quantity) AS revenue
+FROM restaurant_data
+GROUP BY order_date
+ORDER BY order_date;
+-- Q5. Average Revenue
+SELECT
+    AVG(price * quantity) AS average_revenue
+FROM restaurant_data;
+-- Q6. Average Revenue for November and December
+SELECT
+    YEAR(order_date) AS year_,
+    MONTH(order_date) AS month_,
+    AVG(price * quantity) AS average_revenue
+FROM restaurant_data
+WHERE order_date BETWEEN '2022-11-01' AND '2022-12-31'
+GROUP BY
+    YEAR(order_date),
+    MONTH(order_date)
+ORDER BY
+    year_,
+    month_;
+   -- Q7. Is Revenue Increasing or Decreasing Over Time?
+   WITH revenue_cte AS
+(
+    SELECT
+        order_date,
+        SUM(price * quantity) AS revenue
+    FROM restaurant_data
+    GROUP BY order_date
+)
+SELECT
+    order_date,
+    revenue AS current_revenue,
+    LAG(revenue) OVER (ORDER BY order_date) AS previous_revenue,
+    revenue -
+        LAG(revenue) OVER (ORDER BY order_date) AS revenue_difference
+FROM revenue_cte
+ORDER BY order_date;
+-- Q8. Average Quantity Sold & Average Revenue for Each Product
+SELECT
+    product_name,
+    AVG(quantity) AS avg_quantity_sold,
+    AVG(price * quantity) AS avg_revenue_per_product
+FROM restaurant_data
+GROUP BY product_name
+ORDER BY avg_revenue_per_product DESC;
